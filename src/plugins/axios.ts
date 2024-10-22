@@ -1,16 +1,18 @@
-// plugins/axios.ts
-import axios, { AxiosInstance, RawAxiosRequestHeaders } from "axios";
-
-const _defaultHeaders: Partial<RawAxiosRequestHeaders> = {
-  Accept: "application/json",
-  "Content-Type": "application/json",
-  Authorization: localStorage.getItem("token"),
-};
+import axios, { AxiosInstance } from "axios";
 
 const _babyNames: AxiosInstance = axios.create({
   baseURL: process.env.VUE_APP_BABYNAMES_URI,
   withCredentials: true,
-  headers: _defaultHeaders,
+});
+
+_babyNames.interceptors.request.use((config) => {
+  const token = localStorage.getItem("token");
+  if (token) {
+    config.headers['Authorization'] = token;
+  }
+  return config;
+}, (error) => {
+  return Promise.reject(error);
 });
 
 export { _babyNames };

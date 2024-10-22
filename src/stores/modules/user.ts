@@ -16,7 +16,7 @@ export const useUsers = defineStore("users", () => {
     }
 
     function getUserName(): string {
-        return user.value ? user.value.name : "";
+        return user.value ? user.value.username : "";
     }
 
     return {

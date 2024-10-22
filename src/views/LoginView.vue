@@ -21,8 +21,17 @@
               ></v-text-field>
               <v-btn @click="authenticate(login, password)" :disabled="!validForm" color="primary">Entrar</v-btn>
               <v-alert v-if="showLoginError" type="error" dismissible>
-                Erro ao fazer login. Por favor, verifique suas credenciais.
+                {{ extractAxiosErrorMessage(loginReq.errorObj) }}
               </v-alert>
+              <v-divider></v-divider>
+              <v-row>
+                <v-col>
+                  <v-btn @click="goToRegister">Cadastrar</v-btn>
+                </v-col>
+                <v-col>
+                  <v-btn @click="goToRecoverPassword">Esqueci minha senha</v-btn>
+                </v-col>
+              </v-row>
             </v-form>
           </v-card-text>
         </v-card>
@@ -62,18 +71,16 @@ export default {
 
       await loginReq.request({
         method: "post",
-        url: "/login",
-        data: { userId: login, password: password },
+        url: "auth/login",
+        data: { username: login, password: password },
         onSuccess: () => {
           if (loginReq.response) {
-            userStore.saveUser(loginReq.response); // Aqui você deve ajustar conforme o formato da resposta
-            router.push({ name: "home" });
+            userStore.saveUser(loginReq.response); 
+            router.push({ name: "names" });
           }
         },
         onError: () => {
           showLoginError.value = true;
-          const errorMessage = extractAxiosErrorMessage(loginReq.errorObj);
-          console.error(errorMessage); // Log para debug
           clearLoginFields();
         }
       });
@@ -84,6 +91,14 @@ export default {
       password.value = "";
     }
 
+    function goToRegister() {
+      router.push({ name: "register" });
+    }
+
+    function goToRecoverPassword() {
+      router.push({ name: "recoverPassword" });
+    }
+
     return {
       validForm,
       login,
@@ -92,6 +107,10 @@ export default {
       showLoginError,
       rules,
       authenticate,
+      goToRegister,
+      goToRecoverPassword,
+      extractAxiosErrorMessage,
+      loginReq
     };
   },
 };
